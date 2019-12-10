@@ -1,7 +1,5 @@
 package com.everis.bc.servicioCreditoTC.model;
 
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
@@ -19,8 +17,46 @@ public class CreditoTC {
 	private double saldo;
 	@NotNull
 	private double limite;
+	@NotNull
+	private String name="";
+	@NotNull
+	private String lastname="";
+	@NotNull
+	private String doc="";
+	@NotNull
+	private String producto="";
 	
-	private List<Listas> titulares;
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getDoc() {
+		return doc;
+	}
+
+	public void setDoc(String doc) {
+		this.doc = doc;
+	}
+
+	public String getProducto() {
+		return producto;
+	}
+
+	public void setProducto(String producto) {
+		this.producto = producto;
+	}
 	
 	public String getNro_tarjeta() {
 		return nro_tarjeta;
@@ -63,14 +99,5 @@ public class CreditoTC {
 	public void setSaldo(double saldo) {
 		this.saldo = saldo;
 	}
-
-	public List<Listas> getTitulares() {
-		return titulares;
-	}
-
-	public void setTitulares(List<Listas> titulares) {
-		this.titulares = titulares;
-	}
-
 
 }

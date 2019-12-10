@@ -1,20 +1,13 @@
 package com.everis.bc.servicioCreditoTC.service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.everis.bc.servicioCreditoTC.model.CreditoTC;
-import com.everis.bc.servicioCreditoTC.model.Empresa;
-import com.everis.bc.servicioCreditoTC.model.Listas;
 import com.everis.bc.servicioCreditoTC.model.Movimientos;
-import com.everis.bc.servicioCreditoTC.model.Persona;
 import com.everis.bc.servicioCreditoTC.repo.Repo;
 import com.everis.bc.servicioCreditoTC.repo.RepoMovimientos;
 
@@ -29,45 +22,14 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	@Autowired
 	private RepoMovimientos repoMov;
 	
-	@Autowired
-	private WebClient client;
-	
-	//private List<String> aux;
 	@Override
-	public Mono<Map<String, Object>> saveData(CreditoTC cuenta) {
+	public Mono<Map<String, Object>> saveData(CreditoTC tc) {
 		Map<String, Object> respuesta = new HashMap<String, Object>();
 		//validando tipo de cuenta: Persona o Empresa
-		if(cuenta.getTipo().equals("P")) {
-			
-			cuenta.getTitulares().stream().forEach(titular->{
-			
-			client.post().uri("/savePersonaData").accept(MediaType.APPLICATION_JSON_UTF8)
-					.contentType(MediaType.APPLICATION_JSON_UTF8)
-					.body(BodyInserters.fromObject(titular))
-					.retrieve()
-					.bodyToMono(Persona.class).subscribe();
-			
-			});
-			return repo1.save(cuenta).map(cta->{
-				respuesta.put("Mensaje: ", "guardado correcto");
-				return  respuesta;
-			});
-			
-		}else {
-			return Mono.just(cuenta).map(c->{
-				respuesta.put("Error", "Las cuentas de ahorro son solo para clintes Persona.");
-				return respuesta;
-			});
-		}
-		
-		
-		// TODO Auto-generated method stub
-		
-		/*return repo1.save(cuenta).map(cta->{
+		return repo1.save(tc).map(tdc->{
 			respuesta.put("Mensaje: ", "guardado correcto");
 			return  respuesta;
-		});*/
-		//respuesta.put("Mensaje: ", "guardado correcto");
+		});
 		
 	}
 
@@ -110,14 +72,22 @@ public class ServiceCreditoImplement implements ServiceCredito {
 					
 				}
 				case "pago":{
-					tc.setSaldo(saldo+movimiento.getMonto());
-					repo1.save(tc).subscribe();
-					repoMov.save(movimiento);
-					respuesta.put("Result", "Pago realizado, su nuevo saldo es: "+(saldo+movimiento.getMonto()));
-					return respuesta;
+					if(saldo+movimiento.getMonto()<=tc.getLimite()) {
+						tc.setSaldo(saldo+movimiento.getMonto());
+						repo1.save(tc).subscribe();
+						repoMov.save(movimiento);
+						respuesta.put("Result", "Pago realizado, su nuevo saldo es: "+(saldo+movimiento.getMonto()));
+						return respuesta;
+					}else {
+						respuesta.put("Error", "El saldo de su tarjeta no debe ser mayor a su limite de credito");
+						return respuesta;
+					}
+					
+					
 				}
+				
 			}
-			respuesta.put("Error", "Especifique el movimiento a realizar");
+			respuesta.put("Error", "Movimiento desconocido");
 			return respuesta;
 		});
 		
