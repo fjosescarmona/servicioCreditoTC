@@ -18,13 +18,13 @@ public class CreditoTC {
 	@NotNull
 	private double limite;
 	@NotNull
-	private String name="";
+	private String name;
 	@NotNull
-	private String lastname="";
+	private String lastname;
 	@NotNull
-	private String doc="";
+	private String doc;
 	@NotNull
-	private String producto="";
+	private String producto;
 	
 	public String getName() {
 		return name;

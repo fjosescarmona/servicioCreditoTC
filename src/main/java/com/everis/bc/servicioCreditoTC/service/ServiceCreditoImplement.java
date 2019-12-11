@@ -25,7 +25,6 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	@Override
 	public Mono<Map<String, Object>> saveData(CreditoTC tc) {
 		Map<String, Object> respuesta = new HashMap<String, Object>();
-		//validando tipo de cuenta: Persona o Empresa
 		return repo1.save(tc).map(tdc->{
 			respuesta.put("Mensaje: ", "guardado correcto");
 			return  respuesta;
@@ -75,7 +74,7 @@ public class ServiceCreditoImplement implements ServiceCredito {
 					if(saldo+movimiento.getMonto()<=tc.getLimite()) {
 						tc.setSaldo(saldo+movimiento.getMonto());
 						repo1.save(tc).subscribe();
-						repoMov.save(movimiento);
+						repoMov.save(movimiento).subscribe();
 						respuesta.put("Result", "Pago realizado, su nuevo saldo es: "+(saldo+movimiento.getMonto()));
 						return respuesta;
 					}else {
