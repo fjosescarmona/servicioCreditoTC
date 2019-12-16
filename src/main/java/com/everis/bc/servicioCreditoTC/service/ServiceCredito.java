@@ -15,7 +15,7 @@ public interface ServiceCredito {
 	
 	public Flux<CreditoTC> getData();
 	
-	public Mono<CreditoTC> getDataByDoc(String doc);
+	public Flux<CreditoTC> getDataByDoc(String doc);
 
 	public Mono<Map<String, Object>> getSaldo(String nro_tarjeta);
 

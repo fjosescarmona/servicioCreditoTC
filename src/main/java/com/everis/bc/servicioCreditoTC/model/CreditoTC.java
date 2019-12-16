@@ -10,21 +10,21 @@ public class CreditoTC {
 	@Id
 	private String id;
 	@NotNull
-	private String nro_tarjeta;
+	private String nro_tarjeta="";
 	@NotNull
-	private String tipo;
+	private String tipo="";
 	@NotNull
-	private double saldo;
+	private double saldo=0.0;
 	@NotNull
-	private double limite;
+	private double limite=0.0;
 	@NotNull
-	private String name;
+	private String name="";
 	@NotNull
-	private String lastname;
+	private String lastname="";
 	@NotNull
-	private String doc;
+	private String doc="";
 	@NotNull
-	private String producto;
+	private String producto="";
 	
 	public String getName() {
 		return name;

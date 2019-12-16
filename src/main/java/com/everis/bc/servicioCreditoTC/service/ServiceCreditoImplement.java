@@ -27,6 +27,7 @@ public class ServiceCreditoImplement implements ServiceCredito {
 		Map<String, Object> respuesta = new HashMap<String, Object>();
 		return repo1.save(tc).map(tdc->{
 			respuesta.put("Mensaje: ", "guardado correcto");
+			respuesta.put("Info: ", tdc);
 			return  respuesta;
 		});
 		
@@ -62,7 +63,7 @@ public class ServiceCreditoImplement implements ServiceCredito {
 						tc.setSaldo(saldo-movimiento.getMonto());
 						repo1.save(tc).subscribe();
 						repoMov.save(movimiento).subscribe();
-						respuesta.put("Result", "Consumo realizado, su nuevo saldo es: "+(saldo-movimiento.getMonto()));
+						respuesta.put("Result", "Consumo realizado, su credito disponible es: "+(saldo-movimiento.getMonto()));
 						return respuesta;
 					}else {
 						respuesta.put("Result", "Su saldo no es suficiente para realizar la operaciòn");
@@ -103,9 +104,14 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	}
 
 	@Override
-	public Mono<CreditoTC> getDataByDoc(String doc) {
+	public Flux<CreditoTC> getDataByDoc(String doc) {
 		// TODO Auto-generated method stub
-		return repo1.findByTitularesDoc(doc);
+		return repo1.findByTitularesDoc(doc)
+				.switchIfEmpty(Mono.just("").flatMap(r->{
+					CreditoTC tc=new CreditoTC();
+					return Mono.just(tc);
+				})
+				);
 	}
 
 	@Override
@@ -114,7 +120,7 @@ public class ServiceCreditoImplement implements ServiceCredito {
 		Map<String, Object> respuesta = new HashMap<String, Object>();
 		
 		return repo1.findByNro_tarjeta(nro_tarjeta).map(tc->{
-			respuesta.put("saldo", tc.getSaldo());
+			respuesta.put("Credito Disponible", tc.getSaldo());
 			return respuesta;
 		});
 		//return null;

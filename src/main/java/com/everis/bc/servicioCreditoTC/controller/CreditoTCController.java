@@ -28,7 +28,7 @@ public class CreditoTCController {
 	}
 	
 	@GetMapping("/getTCData/{doc}")
-	public Mono<CreditoTC> getTCData(@PathVariable("doc") String doc){
+	public Flux<CreditoTC> getTCData(@PathVariable("doc") String doc){
 		return s_cuenta.getDataByDoc(doc);
 	}
 	
