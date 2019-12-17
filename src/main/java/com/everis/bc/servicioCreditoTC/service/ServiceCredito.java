@@ -25,5 +25,5 @@ public interface ServiceCredito {
 	
 	public Mono<Map<String, Object>> saveMovimiento(Movimientos mov);
 	
-	public Flux<Movimientos> getMovimientos();
+	public Flux<Movimientos> getMovimientos(String nro_tarjeta);
 }

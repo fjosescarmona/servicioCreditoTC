@@ -42,9 +42,9 @@ public class CreditoTCController {
 		return s_cuenta.saveMovimiento(movimiento);
 	}
 	
-	@GetMapping("/getMovimientosTC")
-	public Flux<Movimientos> getMovimientosTC(){
-		return s_cuenta.getMovimientos();
+	@GetMapping("/getMovimientosTC/{nro_tarjeta}")
+	public Flux<Movimientos> getMovimientosTC(@PathVariable("nro_tarjeta") String nro_tarjeta){
+		return s_cuenta.getMovimientos(nro_tarjeta);
 	}
 
 }

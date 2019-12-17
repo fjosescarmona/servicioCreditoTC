@@ -98,9 +98,9 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	}
 
 	@Override
-	public Flux<Movimientos> getMovimientos() {
+	public Flux<Movimientos> getMovimientos(String nro_tarjeta) {
 		// TODO Auto-generated method stub
-		return repoMov.findAll();
+		return repoMov.findByNro_tarjeta(nro_tarjeta);
 	}
 
 	@Override
