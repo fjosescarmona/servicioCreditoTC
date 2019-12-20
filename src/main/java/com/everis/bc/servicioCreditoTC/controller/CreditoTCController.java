@@ -37,9 +37,14 @@ public class CreditoTCController {
 		return s_cuenta.getSaldo(nro_tarjeta);
 	}
 	
-	@PostMapping("/saveMovimientosTC")
-	public Mono<Map<String, Object>> saveMovimientosTC(@RequestBody Movimientos movimiento){
-		return s_cuenta.saveMovimiento(movimiento);
+	@PostMapping("/saveConsumoTC")
+	public Mono<Movimientos> saveConsumoTC(@RequestBody Movimientos movimiento){
+		return s_cuenta.saveConsumo(movimiento);
+	}
+	
+	@PostMapping("/savePagoTC")
+	public Mono<Movimientos> savePagoTC(@RequestBody Movimientos movimiento){
+		return s_cuenta.savePago(movimiento);
 	}
 	
 	@GetMapping("/getMovimientosTC/{nro_tarjeta}")

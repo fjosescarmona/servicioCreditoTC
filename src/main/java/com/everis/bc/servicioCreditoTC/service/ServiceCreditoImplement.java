@@ -52,52 +52,6 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	}
 
 	@Override
-	public Mono<Map<String, Object>> saveMovimiento(Movimientos movimiento) {
-		Map<String, Object> respuesta = new HashMap<String, Object>();
-		
-		return repo1.findByNro_tarjeta(movimiento.getNro_tarjeta()).map(tc -> {
-			Double saldo=tc.getSaldo();
-			switch(movimiento.getDescripcion()) {
-				case "consumo":{
-					if(saldo>=movimiento.getMonto()) {
-						tc.setSaldo(saldo-movimiento.getMonto());
-						repo1.save(tc).subscribe();
-						repoMov.save(movimiento).subscribe();
-						respuesta.put("Result", "Consumo realizado, su credito disponible es: "+(saldo-movimiento.getMonto()));
-						return respuesta;
-					}else {
-						respuesta.put("Result", "Su saldo no es suficiente para realizar la operaciòn");
-						return respuesta;
-					}
-					
-				}
-				case "pago":{
-					if(saldo+movimiento.getMonto()<=tc.getLimite()) {
-						tc.setSaldo(saldo+movimiento.getMonto());
-						repo1.save(tc).subscribe();
-						repoMov.save(movimiento).subscribe();
-						respuesta.put("Result", "Pago realizado, su nuevo saldo es: "+(saldo+movimiento.getMonto()));
-						return respuesta;
-					}else {
-						respuesta.put("Error", "El saldo de su tarjeta no debe ser mayor a su limite de credito");
-						return respuesta;
-					}
-					
-					
-				}
-				
-			}
-			respuesta.put("Error", "Movimiento desconocido");
-			return respuesta;
-		});
-		
-		/*return repoMov.save(movimiento).map(mov->{
-			respuesta.put("Mensaje: ", "ok");
-			return  respuesta;
-		});*/
-	}
-
-	@Override
 	public Flux<Movimientos> getMovimientos(String nro_tarjeta) {
 		// TODO Auto-generated method stub
 		return repoMov.findByNro_tarjeta(nro_tarjeta);
@@ -124,6 +78,37 @@ public class ServiceCreditoImplement implements ServiceCredito {
 			return respuesta;
 		});
 		//return null;
+	}
+
+	@Override
+	public Mono<Movimientos> saveConsumo(Movimientos mov) {
+		// TODO Auto-generated method stub
+		return repo1.findByNro_tarjeta(mov.getNro_tarjeta()).flatMap(tc->{
+			if(tc.getSaldo()>=mov.getMonto()) {
+				tc.setSaldo(tc.getSaldo()-mov.getMonto());
+				repo1.save(tc).subscribe();
+				return repoMov.save(mov);
+				
+			}else {
+				return Mono.just(new Movimientos());
+			}
+		});
+		
+	}
+
+	@Override
+	public Mono<Movimientos> savePago(Movimientos mov) {
+		// TODO Auto-generated method stub
+		return repo1.findByNro_tarjeta(mov.getNro_tarjeta()).flatMap(tc->{
+			if(tc.getSaldo()+mov.getMonto()<=tc.getLimite()) {
+				tc.setSaldo(tc.getSaldo()+mov.getMonto());
+				repo1.save(tc).subscribe();
+				return repoMov.save(mov);
+				
+			}else {
+				return Mono.just(new Movimientos());
+			}
+		});
 	}
 
 }

@@ -23,7 +23,9 @@ public interface ServiceCredito {
 	
 	public Mono<CreditoTC> editData(String id, CreditoTC tc);
 	
-	public Mono<Map<String, Object>> saveMovimiento(Movimientos mov);
+	public Mono<Movimientos> saveConsumo(Movimientos mov);
+	
+	public Mono<Movimientos> savePago(Movimientos mov);
 	
 	public Flux<Movimientos> getMovimientos(String nro_tarjeta);
 }

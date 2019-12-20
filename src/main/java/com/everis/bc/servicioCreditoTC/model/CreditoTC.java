@@ -10,6 +10,10 @@ public class CreditoTC {
 	@Id
 	private String id;
 	@NotNull
+	private String bankcode="";
+	@NotNull
+	private String bank="";
+	@NotNull
 	private String nro_tarjeta="";
 	@NotNull
 	private String tipo="";
@@ -26,6 +30,22 @@ public class CreditoTC {
 	@NotNull
 	private String producto="";
 	
+	public String getBankcode() {
+		return bankcode;
+	}
+
+	public void setBankcode(String bankcode) {
+		this.bankcode = bankcode;
+	}
+
+	public String getBank() {
+		return bank;
+	}
+
+	public void setBank(String bank) {
+		this.bank = bank;
+	}
+
 	public String getName() {
 		return name;
 	}
