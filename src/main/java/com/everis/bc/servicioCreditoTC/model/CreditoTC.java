@@ -1,9 +1,12 @@
 package com.everis.bc.servicioCreditoTC.model;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Document(collection="c_ctarjetacredito")
 public class CreditoTC {
@@ -29,7 +32,38 @@ public class CreditoTC {
 	private String doc="";
 	@NotNull
 	private String producto="";
+	@NotNull
+	private double minimo=0.0;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date fechaPago;
+	@NotNull
+	private String estadoPago;
 	
+	
+	public String getEstadoPago() {
+		return estadoPago;
+	}
+
+	public void setEstadoPago(String estadoPago) {
+		this.estadoPago = estadoPago;
+	}
+
+	public double getMinimo() {
+		return minimo;
+	}
+
+	public void setMinimo(double minimo) {
+		this.minimo = minimo;
+	}
+
+	public Date getFechaPago() {
+		return fechaPago;
+	}
+
+	public void setFechaPago(Date fechaPago) {
+		this.fechaPago = fechaPago;
+	}
+
 	public String getBankcode() {
 		return bankcode;
 	}

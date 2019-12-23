@@ -1,5 +1,6 @@
 package com.everis.bc.servicioCreditoTC.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,8 +87,22 @@ public class ServiceCreditoImplement implements ServiceCredito {
 		return repo1.findByNro_tarjeta(mov.getNro_tarjeta()).flatMap(tc->{
 			if(tc.getSaldo()>=mov.getMonto()) {
 				tc.setSaldo(tc.getSaldo()-mov.getMonto());
-				repo1.save(tc).subscribe();
-				return repoMov.save(mov);
+				tc.setMinimo(((tc.getLimite()-(tc.getSaldo()-mov.getMonto()))*10)/100);
+				tc.setEstadoPago("pp");
+				if(mov.getFecha().getDay()<5) {
+					Date fecha=mov.getFecha();
+					fecha.setDate(5);
+					tc.setFechaPago(fecha);
+				}else {
+					Date fecha=mov.getFecha();
+					fecha.setDate(5);
+					fecha.setMonth(fecha.getMonth()+1);
+					tc.setFechaPago(fecha);
+				}
+				return repo1.save(tc).flatMap(stc->{
+					return repoMov.save(mov);
+				});
+				
 				
 			}else {
 				return Mono.just(new Movimientos());
@@ -100,11 +115,48 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	public Mono<Movimientos> savePago(Movimientos mov) {
 		// TODO Auto-generated method stub
 		return repo1.findByNro_tarjeta(mov.getNro_tarjeta()).flatMap(tc->{
+			//--------valida que no se pague mas del limite de credito---//
 			if(tc.getSaldo()+mov.getMonto()<=tc.getLimite()) {
 				tc.setSaldo(tc.getSaldo()+mov.getMonto());
-				repo1.save(tc).subscribe();
-				return repoMov.save(mov);
+				tc.setMinimo(((tc.getLimite()-(tc.getSaldo()+mov.getMonto()))*10)/100);
+				//---si paga el total de la deuda no genera intereses y su estado de pago es vacio--//
+				if((tc.getLimite()-(tc.getSaldo()+mov.getMonto()))==0) {
+					tc.setEstadoPago("");
+					//--si tiene deuda se asigna y estado de pago pp y fecha limite de pago--//
+				}else {
+					tc.setEstadoPago("pp");
+					if(mov.getFecha().getDay()<5) {
+						Date fecha=mov.getFecha();
+						fecha.setDate(5);
+						tc.setFechaPago(fecha);
+					}else {
+						Date fecha=mov.getFecha();
+						fecha.setDate(5);
+						fecha.setMonth(fecha.getMonth()+1);
+						tc.setFechaPago(fecha);
+					}
+				}
 				
+				return repo1.save(tc).flatMap(stc->{
+					return repoMov.save(mov);
+				});
+				
+			}else {
+				return Mono.just(new Movimientos());
+			}
+		});
+	}
+
+	@Override
+	public Mono<Movimientos> savePagoMinimo(Movimientos mov) {
+		// TODO Auto-generated method stub
+		return repo1.findByNro_tarjeta(mov.getNro_tarjeta()).flatMap(tc->{
+			if(mov.getMonto()==tc.getMinimo()) {
+				//tc.setMinimo(mov.getMonto()-tc.getMinimo());
+				tc.setEstadoPago("p");
+				return repo1.save(tc).flatMap(stc->{
+					return repoMov.save(mov);
+				});
 			}else {
 				return Mono.just(new Movimientos());
 			}

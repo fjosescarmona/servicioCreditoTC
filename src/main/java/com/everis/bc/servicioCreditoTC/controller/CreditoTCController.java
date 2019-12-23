@@ -47,6 +47,11 @@ public class CreditoTCController {
 		return s_cuenta.savePago(movimiento);
 	}
 	
+	@PostMapping("/savePagoMinimoTC")
+	public Mono<Movimientos> savePagoMinimoTC(@RequestBody Movimientos movimiento){
+		return s_cuenta.savePagoMinimo(movimiento);
+	}
+	
 	@GetMapping("/getMovimientosTC/{nro_tarjeta}")
 	public Flux<Movimientos> getMovimientosTC(@PathVariable("nro_tarjeta") String nro_tarjeta){
 		return s_cuenta.getMovimientos(nro_tarjeta);
