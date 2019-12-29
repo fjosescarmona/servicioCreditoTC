@@ -1,5 +1,6 @@
 package com.everis.bc.servicioCreditoTC.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.everis.bc.servicioCreditoTC.model.CreditoTC;
+import com.everis.bc.servicioCreditoTC.model.Deudores;
 import com.everis.bc.servicioCreditoTC.model.Movimientos;
 import com.everis.bc.servicioCreditoTC.service.ServiceCredito;
 
@@ -23,7 +25,7 @@ public class CreditoTCController {
 	private ServiceCredito s_cuenta;
 
 	@PostMapping("/saveTCData")
-	public Mono<Map<String, Object>> saveTCData(@RequestBody CreditoTC tc){
+	public Mono<CreditoTC> saveTCData(@RequestBody CreditoTC tc){
 		return s_cuenta.saveData(tc);
 	}
 	
@@ -55,6 +57,16 @@ public class CreditoTCController {
 	@GetMapping("/getMovimientosTC/{nro_tarjeta}")
 	public Flux<Movimientos> getMovimientosTC(@PathVariable("nro_tarjeta") String nro_tarjeta){
 		return s_cuenta.getMovimientos(nro_tarjeta);
+	}
+	
+	@GetMapping("/getDeudaVencida")
+	public Flux<CreditoTC> getDeudaVencida(){
+		return s_cuenta.getDeudaVencida();
+	}
+	
+	@PostMapping("/saveDeudoresTC")
+	public Flux<Deudores> saveDeudoresTC(@RequestBody List<Deudores> deudores){
+		return s_cuenta.saveDeudoresTC(deudores);
 	}
 
 }

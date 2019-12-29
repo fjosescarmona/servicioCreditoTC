@@ -1,9 +1,13 @@
 package com.everis.bc.servicioCreditoTC.service;
 
 
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.everis.bc.servicioCreditoTC.model.CreditoTC;
+import com.everis.bc.servicioCreditoTC.model.Deudores;
 import com.everis.bc.servicioCreditoTC.model.Movimientos;
 
 import reactor.core.publisher.Flux;
@@ -11,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 public interface ServiceCredito {
 	
-	public Mono<Map<String, Object>> saveData(CreditoTC tc);
+	public Mono<CreditoTC> saveData(CreditoTC tc);
 	
 	public Flux<CreditoTC> getData();
 	
@@ -30,4 +34,8 @@ public interface ServiceCredito {
 	public Mono<Movimientos> savePagoMinimo(Movimientos mov);
 	
 	public Flux<Movimientos> getMovimientos(String nro_tarjeta);
+	
+	public Flux<CreditoTC> getDeudaVencida();
+	
+	public Flux<Deudores> saveDeudoresTC(List<Deudores> deudores);
 }
