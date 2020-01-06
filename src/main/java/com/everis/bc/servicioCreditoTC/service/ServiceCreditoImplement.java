@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.everis.bc.servicioCreditoTC.model.CreditoTC;
@@ -32,6 +33,10 @@ public class ServiceCreditoImplement implements ServiceCredito {
 	@Autowired
 	@Qualifier("info")
 	private WebClient info;
+	
+	@Autowired
+	@Qualifier("tc")
+	private WebClient tdc;
 	
 	@Autowired
 	private RepoD repod;
@@ -112,8 +117,9 @@ public class ServiceCreditoImplement implements ServiceCredito {
 			int mes=mov.getFecha().getMonth()+1;
 			int dia=mov.getFecha().getDate()+1;
 			if(tc.getSaldo()>=mov.getMonto()) {
-				tc.setSaldo(tc.getSaldo()-mov.getMonto());
+				
 				tc.setMinimo(((tc.getLimite()-(tc.getSaldo()-mov.getMonto()))*10)/100);
+				tc.setSaldo(tc.getSaldo()-mov.getMonto());
 				tc.setEstadoPago("pp");
 				if(dia<5) {
 					Date fecha=new Date();
@@ -209,7 +215,37 @@ public class ServiceCreditoImplement implements ServiceCredito {
 					return repoMov.save(mov);
 				});
 			}else {
-				return Mono.just(new Movimientos());
+				if(mov.getMonto()>tc.getMinimo()) {
+					
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("nro_tarjeta", mov.getNro_tarjeta());
+					params.put("descripcion", "pago");
+					params.put("monto", mov.getMonto()-tc.getMinimo());
+					params.put("fecha", mov.getFecha());
+					
+					return tdc.post().uri("/savePagoTC").accept(MediaType.APPLICATION_JSON_UTF8)
+							.body(BodyInserters.fromObject(params)).retrieve().bodyToMono(Movimientos.class)
+							.flatMap(ptdc -> {
+
+								if (!ptdc.getNro_tarjeta().equals(null)) {
+									
+									return repo1.findByNro_tarjeta(mov.getNro_tarjeta()).flatMap(ntdc->{
+										tc.setEstadoPago("p");
+										return repo1.save(ntdc).flatMap(stc->{
+											mov.setMonto(tc.getMinimo());
+											return repoMov.save(mov);
+										});
+									});
+									
+								} else {
+									return Mono.just(new Movimientos());
+								}
+
+							});
+				}else {
+					return Mono.just(new Movimientos());
+				}
+				
 			}
 		});
 	}
